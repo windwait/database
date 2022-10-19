@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wang.database.dao.WordTableMapper">
+
+
+    <select id="getDateMateName" resultType="java.lang.String">
+        select database()
+    </select>
+    <select id="getDateMateTableName" resultType="com.wang.database.vo.TableNameNote">
+        SELECT TABLE_NAME as tableName,TABLE_COMMENT as tableComment FROM INFORMATION_SCHEMA.TABLES where TABLE_SCHEMA = #{mateName}
+    </select>
+    <select id="selectTables" resultType="com.wang.database.vo.Table">
+        SELECT
+        table_name as tableName,
+            COLUMN_NAME as colName,
+            COLUMN_COMMENT as note,
+            COLUMN_TYPE as type,
+         CASE
+        WHEN IS_NULLABLE = 'YES' THEN
+         'Y'
+        ELSE
+         ''
+                END AS ifNull,
+
+        IF (column_key = 'pri', 'PK', '') as rule
+        FROM
+         INFORMATION_SCHEMA. COLUMNS
+        WHERE
+         table_name in
+        <foreach collection="list" item="item"  open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+</mapper>
